@@ -83,7 +83,10 @@ const TestPlanList = () => {
       .then(data => {
         console.log(data);
         setDataFromDB(data);
-      }, error => console.log('Error')
+      }, error => {
+        setDataFromDB([])
+        console.log('Error')
+      }
       );
   }
 
@@ -178,16 +181,16 @@ const TestPlanList = () => {
     })
     console.log(rowsToRun)
     const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: rowsToRun,
-          // test_name: rowsToRun['test_name'],
-        })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: rowsToRun,
+        // test_name: rowsToRun['test_name'],
+      })
     };
     fetch("http://127.0.0.1:5000/prepare_test", requestOptions)
-        .then(response => response.json())
-        .then(data => console.log(data));
+      .then(response => response.json())
+      .then(data => console.log(data));
   }
 
   const runCreteStep = () => {
@@ -327,56 +330,66 @@ const TestPlanList = () => {
   }
 
 
-
-  return (
-    <TestingContainer>
-      <MainContainer>
-        <PlanListHeader />
-        <TableContainer component={Paper} sx={{ maxHeight: '650px' }} >
-          <Table stickyHeader >
-            <TableHead>
-              <TableRow sx={{ width: '100%' }}>
-                <TableCell sx={{ fontSize: "larger", width: "5%" }}>ID</TableCell>
-                <TableCell sx={{ fontSize: "larger", width: "10%" }}>Test Name</TableCell>
-                <TableCell sx={{ fontSize: "larger", width: "10%" }}>IOS Version</TableCell>
-                <TableCell sx={{ fontSize: "larger", width: "10%" }}>Threshold</TableCell>
-                <TableCell sx={{ fontSize: "larger", width: "10%" }}>Prerequisite</TableCell>
-                <TableCell sx={{ fontSize: "larger", width: "10%" }}>Environment</TableCell>
-                <TableCell sx={{ fontSize: "larger", width: "10%" }}>TimeOut</TableCell>
-                <TableCell sx={{ fontSize: "larger", width: "10%" }}>Site</TableCell>
-                <TableCell sx={{ fontSize: "larger", width: "40%" }}>Summary</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {dataFromDB.map((row) => (
-                <TableRow sx={{
-                  background: isSelected.map(selectedItem => {
-                    return selectedItem === Number(row.test_id) ? 'lightGrey' : null
-                  })
-                }}
-                  onClick={() => setSelectedRow(row)}
-                  key={row.test_id} >
-                  <TableCell>{row.test_id}</TableCell>
-                  <TableCell>{row.test_name}</TableCell>
-                  <TableCell>{row.main_version}</TableCell>
-                  <TableCell>{row.test_threshold}</TableCell>
-                  <TableCell>{row.test_prerequisite}</TableCell>
-                  <TableCell>{row.test_environment}</TableCell>
-                  <TableCell>{row.test_runtime}</TableCell>
-                  <TableCell>{row.test_site}</TableCell>
-                  <TableCell>{row.test_summary}</TableCell>
+  if (dataFromDB?.length < 1 || dataFromDB === undefined) {
+    return (
+      <TestingContainer>
+        <MainContainer>
+          <PlanListHeader />
+          <p>Backend Down, Relaunch</p>
+        </MainContainer>
+      </TestingContainer>
+    )
+  } else {
+    return (
+      <TestingContainer>
+        <MainContainer>
+          <PlanListHeader />
+          <TableContainer component={Paper} sx={{ maxHeight: '650px' }} >
+            <Table stickyHeader >
+              <TableHead>
+                <TableRow sx={{ width: '100%' }}>
+                  <TableCell sx={{ fontSize: "larger", width: "5%" }}>ID</TableCell>
+                  <TableCell sx={{ fontSize: "larger", width: "10%" }}>Test Name</TableCell>
+                  <TableCell sx={{ fontSize: "larger", width: "10%" }}>IOS Version</TableCell>
+                  <TableCell sx={{ fontSize: "larger", width: "10%" }}>Threshold</TableCell>
+                  <TableCell sx={{ fontSize: "larger", width: "10%" }}>Prerequisite</TableCell>
+                  <TableCell sx={{ fontSize: "larger", width: "10%" }}>Environment</TableCell>
+                  <TableCell sx={{ fontSize: "larger", width: "10%" }}>TimeOut</TableCell>
+                  <TableCell sx={{ fontSize: "larger", width: "10%" }}>Site</TableCell>
+                  <TableCell sx={{ fontSize: "larger", width: "40%" }}>Summary</TableCell>
                 </TableRow>
-              ))
-              }
-            </TableBody>
-          </Table>
-        </TableContainer>
-        {/* <TableApp {...{handle}}/>
+              </TableHead>
+              <TableBody>
+                {dataFromDB?.map((row) => (
+                  <TableRow sx={{
+                    background: isSelected.map(selectedItem => {
+                      return selectedItem === Number(row.test_id) ? 'lightGrey' : null
+                    })
+                  }}
+                    onClick={() => setSelectedRow(row)}
+                    key={row.test_id} >
+                    <TableCell>{row.test_id}</TableCell>
+                    <TableCell>{row.test_name}</TableCell>
+                    <TableCell>{row.main_version}</TableCell>
+                    <TableCell>{row.test_threshold}</TableCell>
+                    <TableCell>{row.test_prerequisite}</TableCell>
+                    <TableCell>{row.test_environment}</TableCell>
+                    <TableCell>{row.test_runtime}</TableCell>
+                    <TableCell>{row.test_site}</TableCell>
+                    <TableCell>{row.test_summary}</TableCell>
+                  </TableRow>
+                ))
+                }
+              </TableBody>
+            </Table>
+          </TableContainer>
+          {/* <TableApp {...{handle}}/>
          */}
-        <PlanListFooter {...{ selectedCommand }} />
-      </MainContainer>
-    </TestingContainer>
-  );
-};
+          <PlanListFooter {...{ selectedCommand }} />
+        </MainContainer>
+      </TestingContainer>
+    );
+  };
+}
 
 export default TestPlanList;
